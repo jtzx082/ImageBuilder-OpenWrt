@@ -21,20 +21,20 @@ jobs:
           ./build_firmware.sh
 
       - name: List firmware files (debug)
-        run: ls -lh immortalwrt-imagebuilder-24.10.2-x86-64.Linux-x86_64/bin/targets/x86/64/
+        run: ls -lh openwrt-imagebuilder-24.10.2-x86-64.Linux-x86_64/
 
       - name: Upload firmware artifacts
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: immortalwrt-imagebuilder-24.10.2-x86-64.Linux-x86_64/bin/targets/x86/64/*
+          path: openwrt-imagebuilder-24.10.2-x86-64.Linux-x86_64/bin/targets/x86/64/*
 
       - name: Create GitHub Release and Upload Assets
         uses: softprops/action-gh-release@v2
         with:
           tag_name: firmware-${{ github.run_number }}
           name: Firmware Release ${{ github.run_number }}
-          files: immortalwrt-imagebuilder-24.10.2-x86-64.Linux-x86_64/bin/targets/x86/64/*
+          files: openwrt-imagebuilder-24.10.2-x86-64.Linux-x86_64/bin/targets/x86/64/*
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
