@@ -1,0 +1,33 @@
+name: Build and Release Firmware
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libncurses5-dev gawk git subversion libssl-dev gettext unzip zlib1g-dev file wget
+
+      - name: Run build script
+        run: |
+          chmod +x build_firmware.sh
+          ./build_firmware.sh
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: immortalwrt-imagebuilder-24.10.1-x86-64.Linux-x86_64/bin/targets/x86/64/*
+
+      - name: Delete Old Workflows
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 0
+          keep_minimum_runs: 2

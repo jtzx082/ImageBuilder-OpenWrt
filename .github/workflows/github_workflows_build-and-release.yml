@@ -1,0 +1,46 @@
+name: Build and Release Firmware优化
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libncurses5-dev gawk git subversion libssl-dev gettext unzip zlib1g-dev file wget
+
+      - name: Run build script
+        run: |
+          chmod +x build_firmware.sh
+          ./build_firmware.sh
+
+      - name: List firmware files (debug)
+        run: ls -lh immortalwrt-imagebuilder-24.10.2-x86-64.Linux-x86_64/bin/targets/x86/64/
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: immortalwrt-imagebuilder-24.10.2-x86-64.Linux-x86_64/bin/targets/x86/64/*
+
+      - name: Create GitHub Release and Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: firmware-${{ github.run_number }}
+          name: Firmware Release ${{ github.run_number }}
+          files: immortalwrt-imagebuilder-24.10.2-x86-64.Linux-x86_64/bin/targets/x86/64/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete Old Workflows
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 0
+          keep_minimum_runs: 2
